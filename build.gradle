@@ -1,0 +1,41 @@
+plugins {
+  id 'java'
+  id 'maven'
+  id 'com.gradle.plugin-publish' version '0.9.9'
+  id 'net.minecrell.licenser' version '0.3'
+}
+
+group 'net.kyori'
+version '1.0.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+license {
+  header project.file('header.txt')
+  include '**/*.java'
+  newLine false
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  compile gradleApi()
+}
+
+pluginBundle {
+  website = 'https://github.com/KyoriPowered/pulsar'
+  vcsUrl = 'https://github.com/KyoriPowered/pulsar'
+  description = 'A plugin for creating a distribution.'
+  tags = ['distribution']
+
+  plugins {
+    pulsar {
+      id = 'net.kyori.pulsar'
+      displayName = 'Pulsar'
+    }
+  }
+}
