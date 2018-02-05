@@ -48,7 +48,7 @@ public abstract class PulsarDependency {
 
   public void into(final CopySpec libraries) {
     for(final ResolvedArtifact artifact : this.dependency.getModuleArtifacts()) {
-      libraries.from(artifact.getFile(), new Identifier(artifact.getModuleVersion().getId()).renamingTransformer());
+      libraries.from(artifact.getFile(), spec -> spec.rename(new Identifier(artifact.getModuleVersion().getId()).renamingTransformer()));
     }
   }
 

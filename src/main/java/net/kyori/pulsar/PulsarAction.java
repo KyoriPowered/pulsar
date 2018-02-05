@@ -54,7 +54,7 @@ public class PulsarAction implements Action<Project> {
 
     if(this.extension.self) {
       final Task jar = project.getTasks().getAt(JavaPlugin.JAR_TASK_NAME);
-      libraries.from(jar, new Identifier(project).renamingTransformer());
+      libraries.from(jar, spec -> spec.rename(new Identifier(project).renamingTransformer()));
     }
 
     distribution.getContents().with(libraries);
