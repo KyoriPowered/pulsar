@@ -39,7 +39,7 @@ public class PulsarExtension {
   Collection<Configuration> configurations = new ArrayList<>();
   final PulsarBootstrapImpl bootstrap = new PulsarBootstrapImpl();
   final PulsarDependencies filter;
-  boolean self;
+  boolean self = true;
 
   public PulsarExtension(final Project project) {
     this.filter = new PulsarDependenciesImpl(project);
@@ -51,7 +51,7 @@ public class PulsarExtension {
     return this;
   }
 
-  public PulsarExtension distribution(final Action<PulsarDependencies> action) {
+  public PulsarExtension dependencies(final Action<PulsarDependencies> action) {
     action.execute(this.filter);
     return this;
   }

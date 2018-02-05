@@ -23,6 +23,8 @@
  */
 package net.kyori.pulsar.util;
 
+import org.gradle.api.Project;
+import org.gradle.api.Transformer;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ModuleVersionIdentifier;
 import org.gradle.api.artifacts.ResolvedDependency;
@@ -34,9 +36,18 @@ import javax.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
 
 public final class Identifier {
+  private static final String JAR_EXTENSION = "jar";
   private final String group;
   private final String name;
   @Nullable private final String version;
+
+  public Identifier(final Project project) {
+    this(
+      String.valueOf(project.getGroup()),
+      String.valueOf(project.getName()),
+      String.valueOf(project.getVersion())
+    );
+  }
 
   public Identifier(final Dependency dependency) {
     this(dependency.getGroup(), dependency.getName(), dependency.getVersion());
@@ -46,7 +57,7 @@ public final class Identifier {
     this(dependency.getModule().getId());
   }
 
-  private Identifier(final ModuleVersionIdentifier id) {
+  public Identifier(final ModuleVersionIdentifier id) {
     this(id.getGroup(), id.getName(), id.getVersion());
   }
 
@@ -60,6 +71,10 @@ public final class Identifier {
     return dependency.getModuleGroup().matches(this.group)
       && dependency.getModuleName().matches(this.name)
       && matches(dependency.getModuleVersion(), this.version);
+  }
+
+  public Transformer<String, String> renamingTransformer() {
+    return original -> this.group.replace('.', '/') + '/' + this.name + '/' + this.version + '/' + this.name + '-' + this.version + '.' + JAR_EXTENSION;
   }
 
   private static boolean matches(final String a, final String b) {

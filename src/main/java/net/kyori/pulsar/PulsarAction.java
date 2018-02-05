@@ -24,6 +24,7 @@
 package net.kyori.pulsar;
 
 import net.kyori.pulsar.bootstrap.PulsarBootstrapImpl;
+import net.kyori.pulsar.util.Identifier;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -53,7 +54,7 @@ public class PulsarAction implements Action<Project> {
 
     if(this.extension.self) {
       final Task jar = project.getTasks().getAt(JavaPlugin.JAR_TASK_NAME);
-      libraries.from(jar, spec -> spec.rename(in -> String.valueOf(project.getGroup()) + '-' + in));
+      libraries.from(jar, new Identifier(project).renamingTransformer());
     }
 
     distribution.getContents().with(libraries);

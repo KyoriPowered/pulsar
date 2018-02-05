@@ -23,7 +23,7 @@
  */
 package net.kyori.pulsar.dependency;
 
-import org.gradle.api.artifacts.ModuleVersionIdentifier;
+import net.kyori.pulsar.util.Identifier;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.file.CopySpec;
@@ -32,7 +32,6 @@ import org.gradle.api.specs.Spec;
 import java.util.Optional;
 
 public abstract class PulsarDependency {
-  private static final String JAR_EXTENSION = "jar";
   ResolvedDependency dependency;
   Optional<Boolean> include = Optional.empty();
   private Optional<Boolean> exclude = Optional.empty();
@@ -49,10 +48,7 @@ public abstract class PulsarDependency {
 
   public void into(final CopySpec libraries) {
     for(final ResolvedArtifact artifact : this.dependency.getModuleArtifacts()) {
-      libraries.from(artifact.getFile(), spec -> spec.rename(in -> {
-        final ModuleVersionIdentifier id = artifact.getModuleVersion().getId();
-        return id.getGroup().replace('.', '/') + '/' + id.getName() + '/' + id.getVersion() + '/' + id.getName() + '-' + id.getVersion() + '.' + JAR_EXTENSION;
-      }));
+      libraries.from(artifact.getFile(), new Identifier(artifact.getModuleVersion().getId()).renamingTransformer());
     }
   }
 
