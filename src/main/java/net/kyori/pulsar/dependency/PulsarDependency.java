@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.pulsar.distribution;
+package net.kyori.pulsar.dependency;
 
 import org.gradle.api.artifacts.ModuleVersionIdentifier;
 import org.gradle.api.artifacts.ResolvedArtifact;
@@ -31,17 +31,11 @@ import org.gradle.api.specs.Spec;
 
 import java.util.Optional;
 
-public abstract class PulsarDistributionEntryImpl implements PulsarDistributionEntry {
+public abstract class PulsarDependency {
+  private static final String JAR_EXTENSION = "jar";
   ResolvedDependency dependency;
   Optional<Boolean> include = Optional.empty();
   private Optional<Boolean> exclude = Optional.empty();
-  private Strategy strategy = Strategy.HIERARCHY;
-
-  @Override
-  public PulsarDistributionEntry setStrategy(final Strategy strategy) {
-    this.strategy = strategy;
-    return this;
-  }
 
   void include() {
     this.include = Optional.of(true);
@@ -57,9 +51,7 @@ public abstract class PulsarDistributionEntryImpl implements PulsarDistributionE
     for(final ResolvedArtifact artifact : this.dependency.getModuleArtifacts()) {
       libraries.from(artifact.getFile(), spec -> spec.rename(in -> {
         final ModuleVersionIdentifier id = artifact.getModuleVersion().getId();
-        final StringBuilder sb = new StringBuilder();
-        this.strategy.append(sb, id);
-        return sb.toString();
+        return id.getGroup().replace('.', '/') + '/' + id.getName() + '/' + id.getVersion() + '/' + id.getName() + '-' + id.getVersion() + '.' + JAR_EXTENSION;
       }));
     }
   }
@@ -72,7 +64,7 @@ public abstract class PulsarDistributionEntryImpl implements PulsarDistributionE
     return include && !exclude;
   }
 
-  static class Resolved extends PulsarDistributionEntryImpl {
+  static class Resolved extends PulsarDependency {
     final Spec<? super ResolvedDependency> spec;
 
     Resolved(final Spec<? super ResolvedDependency> spec) {
@@ -89,7 +81,7 @@ public abstract class PulsarDistributionEntryImpl implements PulsarDistributionE
     }
   }
 
-  static class Included extends PulsarDistributionEntryImpl {
+  static class Included extends PulsarDependency {
     Included(final ResolvedDependency dependency) {
       this.dependency = dependency;
       this.include();

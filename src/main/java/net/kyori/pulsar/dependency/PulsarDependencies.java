@@ -21,8 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.pulsar.distribution;
+package net.kyori.pulsar.dependency;
 
-public interface PulsarDistributionEntry {
-  PulsarDistributionEntry setStrategy(final Strategy strategy);
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.ResolvedDependency;
+import org.gradle.api.specs.Spec;
+
+import java.util.Collection;
+
+public interface PulsarDependencies {
+  PulsarDependencies include(final Spec<? super ResolvedDependency> spec);
+
+  PulsarDependencies exclude(final Spec<? super ResolvedDependency> spec);
+
+  Spec<? super ResolvedDependency> dependency(final Object notation);
+
+  Spec<? super ResolvedDependency> dependency(final Dependency dependency);
+
+  Spec<? super ResolvedDependency> project(final String notation);
+
+  Collection<PulsarDependency> resolve(final Collection<Configuration> configurations);
 }

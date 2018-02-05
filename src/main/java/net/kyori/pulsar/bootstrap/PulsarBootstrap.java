@@ -21,40 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.pulsar.distribution;
+package net.kyori.pulsar.bootstrap;
 
-import org.gradle.api.artifacts.ModuleVersionIdentifier;
+import groovy.lang.Closure;
 
-public enum Strategy {
-  ROOT {
-    @Override
-    public void append(final StringBuilder sb, final ModuleVersionIdentifier id) {
-      sb.append(id.getGroup());
-      sb.append('-');
-      sb.append(id.getName());
-      sb.append('-');
-      sb.append(id.getVersion());
-      sb.append('.').append(JAR_EXTENSION);
+import javax.annotation.Nullable;
+
+public interface PulsarBootstrap {
+  PulsarBootstrap setModuleName(final String moduleName);
+
+  PulsarBootstrap setClassName(final String className);
+
+  PulsarBootstrap paths(final Closure<?> closure);
+
+  interface Paths {
+    default void add(final String name) {
+      this.add(name, null);
     }
-  },
-  HIERARCHY {
-    @Override
-    public void append(final StringBuilder sb, final ModuleVersionIdentifier id) {
-      sb.append(id.getGroup().replace('.', '/'));
-      sb.append('/');
-      sb.append(id.getName());
-      sb.append('/');
-      sb.append(id.getVersion());
-      sb.append('/');
-      sb.append(id.getName());
-      sb.append('-');
-      sb.append(id.getVersion());
-      sb.append('.').append(JAR_EXTENSION);
 
+    void add(final String name, @Nullable final Closure<?> closure);
+
+    interface Entry {
+      void setMaxDepth(final int maxDepth);
     }
-  };
-
-  private static final String JAR_EXTENSION = "jar";
-
-  public abstract void append(final StringBuilder sb, final ModuleVersionIdentifier id);
+  }
 }

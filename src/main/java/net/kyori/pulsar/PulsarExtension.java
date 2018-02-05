@@ -23,8 +23,10 @@
  */
 package net.kyori.pulsar;
 
-import net.kyori.pulsar.distribution.PulsarDistribution;
-import net.kyori.pulsar.distribution.PulsarDistributionImpl;
+import net.kyori.pulsar.bootstrap.PulsarBootstrap;
+import net.kyori.pulsar.bootstrap.PulsarBootstrapImpl;
+import net.kyori.pulsar.dependency.PulsarDependencies;
+import net.kyori.pulsar.dependency.PulsarDependenciesImpl;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -35,18 +37,22 @@ import java.util.Collection;
 
 public class PulsarExtension {
   Collection<Configuration> configurations = new ArrayList<>();
-  final PulsarDistribution filter;
+  final PulsarBootstrapImpl bootstrap = new PulsarBootstrapImpl();
+  final PulsarDependencies filter;
   boolean self;
 
   public PulsarExtension(final Project project) {
-    this.filter = new PulsarDistributionImpl(project);
+    this.filter = new PulsarDependenciesImpl(project);
     this.configurations.add(project.getConfigurations().findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME));
   }
 
-  public PulsarExtension distribution(final Action<PulsarDistribution> action) {
-    if(action != null) {
-      action.execute(this.filter);
-    }
+  public PulsarExtension bootstrap(final Action<PulsarBootstrap> action) {
+    action.execute(this.bootstrap);
+    return this;
+  }
+
+  public PulsarExtension distribution(final Action<PulsarDependencies> action) {
+    action.execute(this.filter);
     return this;
   }
 

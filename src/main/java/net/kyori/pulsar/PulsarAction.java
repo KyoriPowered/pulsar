@@ -23,7 +23,7 @@
  */
 package net.kyori.pulsar;
 
-import net.kyori.pulsar.distribution.PulsarDistributionEntryImpl;
+import net.kyori.pulsar.bootstrap.PulsarBootstrapImpl;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -32,6 +32,8 @@ import org.gradle.api.distribution.DistributionContainer;
 import org.gradle.api.distribution.plugins.DistributionPlugin;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.plugins.JavaPlugin;
+
+import java.io.File;
 
 public class PulsarAction implements Action<Project> {
   private final PulsarExtension extension;
@@ -47,9 +49,7 @@ public class PulsarAction implements Action<Project> {
     final CopySpec libraries = project.copySpec();
     libraries.into("libraries");
 
-    for(final PulsarDistributionEntryImpl dependency : this.extension.filter.resolve(this.extension.configurations)) {
-      dependency.into(libraries);
-    }
+    this.extension.filter.resolve(this.extension.configurations).forEach(dependency -> dependency.into(libraries));
 
     if(this.extension.self) {
       final Task jar = project.getTasks().getAt(JavaPlugin.JAR_TASK_NAME);
@@ -57,5 +57,10 @@ public class PulsarAction implements Action<Project> {
     }
 
     distribution.getContents().with(libraries);
+
+    final File bootstrap = new File(new File(project.getBuildDir(), "tmp"), PulsarBootstrapImpl.CONFIGURATION_FILE_NAME);
+    if(this.extension.bootstrap.write(project.getLogger(), bootstrap)) {
+      distribution.getContents().from(bootstrap);
+    }
   }
 }

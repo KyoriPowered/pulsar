@@ -21,16 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.pulsar.distribution;
+package net.kyori.pulsar.dependency;
 
-import groovy.lang.Closure;
 import net.kyori.pulsar.util.Identifier;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.specs.Spec;
-import org.gradle.util.ConfigureUtil;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,36 +37,29 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PulsarDistributionImpl implements PulsarDistribution {
-  private final Map<Identifier, PulsarDistributionEntryImpl> dependencies = new HashMap<>();
+public class PulsarDependenciesImpl implements PulsarDependencies {
+  private final Map<Identifier, PulsarDependency> dependencies = new HashMap<>();
   private final Project project;
   private boolean limitedInclude;
 
-  public PulsarDistributionImpl(final Project project) {
+  public PulsarDependenciesImpl(final Project project) {
     this.project = project;
   }
 
   @Override
-  public PulsarDistribution include(final Spec<? super ResolvedDependency> spec) {
-    this.push((SpecImpl) spec).include();
+  public PulsarDependencies include(final Spec<? super ResolvedDependency> spec) {
+    this.entry((SpecImpl) spec).include();
     return this;
   }
 
   @Override
-  public PulsarDistribution exclude(final Spec<? super ResolvedDependency> spec) {
-    this.push((SpecImpl) spec).exclude();
+  public PulsarDependencies exclude(final Spec<? super ResolvedDependency> spec) {
+    this.entry((SpecImpl) spec).exclude();
     return this;
   }
 
-  @Override
-  public PulsarDistribution configure(final Spec<? super ResolvedDependency> spec, final Closure<?> closure) {
-    final PulsarDistributionEntryImpl dependency = this.push((SpecImpl) spec);
-    ConfigureUtil.configure(closure, dependency);
-    return this;
-  }
-
-  private PulsarDistributionEntryImpl push(final SpecImpl spec) {
-    return this.dependencies.computeIfAbsent(spec.dependency, ignored -> new PulsarDistributionEntryImpl.Resolved(spec));
+  private PulsarDependency entry(final SpecImpl spec) {
+    return this.dependencies.computeIfAbsent(spec.dependency, ignored -> new PulsarDependency.Resolved(spec));
   }
 
   @Override
@@ -90,7 +81,7 @@ public class PulsarDistributionImpl implements PulsarDistribution {
   }
 
   @Override
-  public Collection<PulsarDistributionEntryImpl> resolve(final Collection<Configuration> configurations) {
+  public Collection<PulsarDependency> resolve(final Collection<Configuration> configurations) {
     this.resolveState();
     return configurations.stream()
       .flatMap(configuration -> this.resolve(configuration).stream())
@@ -101,22 +92,22 @@ public class PulsarDistributionImpl implements PulsarDistribution {
     this.limitedInclude = this.dependencies.values().stream().anyMatch(dependency -> dependency.include.isPresent() && dependency.include.get());
   }
 
-  private Collection<PulsarDistributionEntryImpl> resolve(final Configuration configuration) {
-    final Set<PulsarDistributionEntryImpl> artifacts = new HashSet<>();
+  private Collection<PulsarDependency> resolve(final Configuration configuration) {
+    final Set<PulsarDependency> artifacts = new HashSet<>();
     this.resolve(configuration.getResolvedConfiguration().getFirstLevelModuleDependencies(), artifacts);
     return artifacts;
   }
 
-  private void resolve(final Set<ResolvedDependency> dependencies, final Set<PulsarDistributionEntryImpl> artifacts) {
+  private void resolve(final Set<ResolvedDependency> dependencies, final Set<PulsarDependency> artifacts) {
     for(final ResolvedDependency dependency : dependencies) {
       if(!this.limitedInclude) {
-        this.dependencies.computeIfAbsent(new Identifier(dependency), dep -> new PulsarDistributionEntryImpl.Included(dependency));
+        this.dependencies.computeIfAbsent(new Identifier(dependency), dep -> new PulsarDependency.Included(dependency));
       }
 
       this.dependencies.values().stream()
         .filter(it -> it.satisfiedBy(dependency))
         .limit(1)
-        .filter(PulsarDistributionEntryImpl::included)
+        .filter(PulsarDependency::included)
         .forEach(artifacts::add);
 
       this.resolve(dependency.getChildren(), artifacts);
