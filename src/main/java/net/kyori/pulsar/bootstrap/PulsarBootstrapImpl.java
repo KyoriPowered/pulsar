@@ -45,26 +45,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 public class PulsarBootstrapImpl implements PulsarBootstrap {
-  /**
-   * The name of the configuration file.
-   */
-  public static final String CONFIGURATION_FILE_NAME = "bootstrap.xml";
-  /**
-   * The name of the element that contains paths we should search in.
-   */
-  private static final String PATH_ELEMENT_NAME = "path";
-  /**
-   * The name of the optional attribute that contains the maximum depth a path should be searched.
-   */
-  private static final String PATH_MAX_DEPTH_ATTRIBUTE_NAME = "max-depth";
-  /**
-   * The name of the attribute that contains our target module.
-   */
-  private static final String MODULE_ATTRIBUTE_NAME = "module";
-  /**
-   * The name of the attribute that contains our target class.
-   */
-  private static final String CLASS_ATTRIBUTE_NAME = "class";
   private final List<EntryImpl> paths = new ArrayList<>();
   private String moduleName;
   private String className;
@@ -108,8 +88,8 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
       final Element application = document.createElement("application");
       document.appendChild(application);
 
-      application.setAttribute(MODULE_ATTRIBUTE_NAME, this.moduleName);
-      application.setAttribute(CLASS_ATTRIBUTE_NAME, this.className);
+      application.setAttribute(BootstrapConstants.MODULE_ATTRIBUTE_NAME, this.moduleName);
+      application.setAttribute(BootstrapConstants.CLASS_ATTRIBUTE_NAME, this.className);
 
       for(final EntryImpl entry : this.paths) {
         entry.write(document, application);
@@ -150,10 +130,10 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
     }
 
     void write(final Document document, final Element application) {
-      final Element path = document.createElement(PATH_ELEMENT_NAME);
+      final Element path = document.createElement(BootstrapConstants.PATH_ELEMENT_NAME);
       path.appendChild(document.createTextNode(this.name));
       if(this.maxDepth.isPresent()) {
-        path.setAttribute(PATH_MAX_DEPTH_ATTRIBUTE_NAME, String.valueOf(this.maxDepth.getAsInt()));
+        path.setAttribute(BootstrapConstants.PATH_MAX_DEPTH_ATTRIBUTE_NAME, String.valueOf(this.maxDepth.getAsInt()));
       }
       application.appendChild(path);
     }

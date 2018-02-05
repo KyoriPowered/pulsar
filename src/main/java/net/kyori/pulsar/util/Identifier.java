@@ -23,6 +23,7 @@
  */
 package net.kyori.pulsar.util;
 
+import net.kyori.pulsar.bootstrap.BootstrapConstants;
 import org.gradle.api.Project;
 import org.gradle.api.Transformer;
 import org.gradle.api.artifacts.Dependency;
@@ -74,7 +75,27 @@ public final class Identifier {
   }
 
   public Transformer<String, String> renamingTransformer() {
-    return original -> this.group.replace('.', '/') + '/' + this.name + '/' + this.version + '/' + this.name + '-' + this.version + '.' + JAR_EXTENSION;
+    final StringBuilder sb = new StringBuilder();
+
+    if(this.useHierarchy()) {
+      sb.append(this.group.replace('.', '/'));
+      sb.append('/');
+      sb.append(this.name);
+      sb.append('/');
+      sb.append(this.version);
+      sb.append('/');
+    } else {
+      sb.append(this.group);
+      sb.append('-');
+    }
+
+    sb.append(this.name).append('-').append(this.version).append('.').append(JAR_EXTENSION);
+
+    return original -> sb.toString();
+  }
+
+  private boolean useHierarchy() {
+    return !(BootstrapConstants.BOOTSTRAP_ARTIFACT_GROUP.equals(this.group) && BootstrapConstants.BOOTSTRAP_ARTIFACT_NAME.equals(this.name));
   }
 
   private static boolean matches(final String a, final String b) {

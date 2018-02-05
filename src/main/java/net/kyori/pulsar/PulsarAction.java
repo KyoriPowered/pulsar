@@ -23,7 +23,7 @@
  */
 package net.kyori.pulsar;
 
-import net.kyori.pulsar.bootstrap.PulsarBootstrapImpl;
+import net.kyori.pulsar.bootstrap.BootstrapConstants;
 import net.kyori.pulsar.util.Identifier;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
@@ -59,7 +59,7 @@ public class PulsarAction implements Action<Project> {
 
     distribution.getContents().with(libraries);
 
-    final File bootstrap = new File(new File(project.getBuildDir(), "tmp"), PulsarBootstrapImpl.CONFIGURATION_FILE_NAME);
+    final File bootstrap = new File(new File(project.getBuildDir(), "tmp"), BootstrapConstants.CONFIGURATION_FILE_NAME);
     if(this.extension.bootstrap.write(project.getLogger(), bootstrap)) {
       distribution.getContents().from(bootstrap);
     }
