@@ -33,6 +33,10 @@ public class BootstrapConstants {
    */
   public static final String PATH_ELEMENT_NAME = "path";
   /**
+   * The name of the optional attribute that contains the minimum depth a path should be searched.
+   */
+  public static final String PATH_MIN_DEPTH_ATTRIBUTE_NAME = "min-depth";
+  /**
    * The name of the optional attribute that contains the maximum depth a path should be searched.
    */
   public static final String PATH_MAX_DEPTH_ATTRIBUTE_NAME = "max-depth";

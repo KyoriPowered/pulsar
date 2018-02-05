@@ -118,10 +118,16 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
 
   public static class EntryImpl implements Paths.Entry {
     private final String name;
+    private OptionalInt minDepth = OptionalInt.empty();
     private OptionalInt maxDepth = OptionalInt.empty();
 
     EntryImpl(final String name) {
       this.name = name;
+    }
+
+    @Override
+    public void setMinDepth(final int minDepth) {
+      this.minDepth = OptionalInt.of(minDepth);
     }
 
     @Override
@@ -132,6 +138,9 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
     void write(final Document document, final Element application) {
       final Element path = document.createElement(BootstrapConstants.PATH_ELEMENT_NAME);
       path.appendChild(document.createTextNode(this.name));
+      if(this.minDepth.isPresent()) {
+        path.setAttribute(BootstrapConstants.PATH_MIN_DEPTH_ATTRIBUTE_NAME, String.valueOf(this.minDepth.getAsInt()));
+      }
       if(this.maxDepth.isPresent()) {
         path.setAttribute(BootstrapConstants.PATH_MAX_DEPTH_ATTRIBUTE_NAME, String.valueOf(this.maxDepth.getAsInt()));
       }

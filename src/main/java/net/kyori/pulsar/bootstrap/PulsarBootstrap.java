@@ -42,6 +42,8 @@ public interface PulsarBootstrap {
     void add(final String name, @Nullable final Closure<?> closure);
 
     interface Entry {
+      void setMinDepth(final int minDepth);
+
       void setMaxDepth(final int maxDepth);
     }
   }
