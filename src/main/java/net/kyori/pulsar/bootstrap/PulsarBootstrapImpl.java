@@ -32,7 +32,9 @@ import org.w3c.dom.Element;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,7 +47,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 public class PulsarBootstrapImpl implements PulsarBootstrap {
-  private final List<EntryImpl> paths = new ArrayList<>();
+  private final List<PathEntryImpl> paths = new ArrayList<>();
+  private final Map<String, String> properties = new HashMap<>();
   private String moduleName;
   private String className;
 
@@ -64,6 +67,12 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
   @Override
   public PulsarBootstrap paths(final Closure<?> closure) {
     ConfigureUtil.configure(closure, new PathsImpl());
+    return this;
+  }
+
+  @Override
+  public PulsarBootstrap properties(final Closure<?> closure) {
+    ConfigureUtil.configure(closure, new PropertiesImpl());
     return this;
   }
 
@@ -91,12 +100,20 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
       application.setAttribute(BootstrapConstants.MODULE_ATTRIBUTE_NAME, this.moduleName);
       application.setAttribute(BootstrapConstants.CLASS_ATTRIBUTE_NAME, this.className);
 
-      for(final EntryImpl entry : this.paths) {
+      for(final PathEntryImpl entry : this.paths) {
         entry.write(document, application);
+      }
+
+      for(final Map.Entry<String, String> entry : this.properties.entrySet()) {
+        final Element property = document.createElement(BootstrapConstants.PROPERTY_ELEMENT_NAME);
+        property.setAttribute(BootstrapConstants.PROPERTY_KEY_ATTRIBUTE_NAME, entry.getKey());
+        property.appendChild(document.createTextNode(entry.getValue()));
+        application.appendChild(property);
       }
 
       final Transformer transformer = TransformerFactory.newInstance().newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
       transformer.transform(new DOMSource(document), new StreamResult(file));
     } catch(final ParserConfigurationException | TransformerException e) {
       logger.error("Encountered an exception while writing bootstrap configuration", e);
@@ -108,7 +125,7 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
   public class PathsImpl implements Paths {
     @Override
     public void add(final String name, final Closure<?> closure) {
-      final EntryImpl entry = new EntryImpl(name);
+      final PathEntryImpl entry = new PathEntryImpl(name);
       PulsarBootstrapImpl.this.paths.add(entry);
       if(closure != null) {
         ConfigureUtil.configure(closure, entry);
@@ -116,12 +133,12 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
     }
   }
 
-  public static class EntryImpl implements Paths.Entry {
+  public static class PathEntryImpl implements Paths.Entry {
     private final String name;
     private OptionalInt minDepth = OptionalInt.empty();
     private OptionalInt maxDepth = OptionalInt.empty();
 
-    EntryImpl(final String name) {
+    PathEntryImpl(final String name) {
       this.name = name;
     }
 
@@ -145,6 +162,13 @@ public class PulsarBootstrapImpl implements PulsarBootstrap {
         path.setAttribute(BootstrapConstants.PATH_MAX_DEPTH_ATTRIBUTE_NAME, String.valueOf(this.maxDepth.getAsInt()));
       }
       application.appendChild(path);
+    }
+  }
+
+  public class PropertiesImpl implements Properties {
+    @Override
+    public void put(final String key, final String value) {
+      PulsarBootstrapImpl.this.properties.put(key, value);
     }
   }
 }

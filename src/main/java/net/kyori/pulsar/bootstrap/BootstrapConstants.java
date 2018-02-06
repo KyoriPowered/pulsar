@@ -29,6 +29,14 @@ public class BootstrapConstants {
    */
   public static final String CONFIGURATION_FILE_NAME = "bootstrap.xml";
   /**
+   * The name of the attribute that contains our target module.
+   */
+  public static final String MODULE_ATTRIBUTE_NAME = "module";
+  /**
+   * The name of the attribute that contains our target class.
+   */
+  public static final String CLASS_ATTRIBUTE_NAME = "class";
+  /**
    * The name of the element that contains paths we should search in.
    */
   public static final String PATH_ELEMENT_NAME = "path";
@@ -41,13 +49,13 @@ public class BootstrapConstants {
    */
   public static final String PATH_MAX_DEPTH_ATTRIBUTE_NAME = "max-depth";
   /**
-   * The name of the attribute that contains our target module.
+   * The name of the element that contains system properties we should set.
    */
-  public static final String MODULE_ATTRIBUTE_NAME = "module";
+  public static final String PROPERTY_ELEMENT_NAME = "property";
   /**
-   * The name of the attribute that contains our target class.
+   * The name of the attribute that contains a property key.
    */
-  public static final String CLASS_ATTRIBUTE_NAME = "class";
+  public static final String PROPERTY_KEY_ATTRIBUTE_NAME = "key";
 
   /**
    * The name of the group that the bootstrap artifact is in.

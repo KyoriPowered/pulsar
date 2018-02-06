@@ -34,6 +34,8 @@ public interface PulsarBootstrap {
 
   PulsarBootstrap paths(final Closure<?> closure);
 
+  PulsarBootstrap properties(final Closure<?> closure);
+
   interface Paths {
     default void add(final String name) {
       this.add(name, null);
@@ -46,5 +48,9 @@ public interface PulsarBootstrap {
 
       void setMaxDepth(final int maxDepth);
     }
+  }
+
+  interface Properties {
+    void put(final String key, final String value);
   }
 }
