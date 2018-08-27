@@ -27,15 +27,21 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.distribution.plugins.DistributionPlugin;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.PluginManager;
 
 public class PulsarPlugin implements Plugin<Project> {
   @Override
   public void apply(final Project project) {
-    project.getPluginManager().apply(DistributionPlugin.class);
+    this.applyDependencies(project.getPluginManager());
 
-    final PulsarExtension extension = project.getExtensions().create("pulsar", PulsarExtension.class, project);
+    final PulsarExtension extension = project.getExtensions().create(Pulsar.EXTENSION_NAME, PulsarExtension.class, project);
     extension.getConfigurations().add(project.getConfigurations().findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME));
 
     project.afterEvaluate(new PulsarAction(extension));
+  }
+
+  private void applyDependencies(final PluginManager pm) {
+    pm.apply(DistributionPlugin.class);
+    pm.apply(JavaPlugin.class);
   }
 }

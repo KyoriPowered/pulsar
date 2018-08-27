@@ -21,39 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.kyori.pulsar.bootstrap;
+package net.kyori.pulsar;
 
-public interface BootstrapConstants {
+public interface Pulsar {
   /**
-   * The name of the configuration file.
+   * The name of the distribution.
    */
-  String CONFIGURATION_FILE_NAME = "bootstrap.xml";
+  String DISTRIBUTION_NAME = "pulsar";
   /**
-   * The name of the attribute that contains our target module.
+   * The name of the extension.
    */
-  String MODULE_ATTRIBUTE_NAME = "module";
+  String EXTENSION_NAME = "pulsar";
+
   /**
-   * The name of the attribute that contains our target class.
+   * The libraries directory name.
    */
-  String CLASS_ATTRIBUTE_NAME = "class";
-  /**
-   * The name of the element that contains paths we should search in.
-   */
-  String PATH_ELEMENT_NAME = "path";
-  /**
-   * The name of the optional attribute that contains the minimum depth a path should be searched.
-   */
-  String PATH_MIN_DEPTH_ATTRIBUTE_NAME = "min-depth";
-  /**
-   * The name of the optional attribute that contains the maximum depth a path should be searched.
-   */
-  String PATH_MAX_DEPTH_ATTRIBUTE_NAME = "max-depth";
-  /**
-   * The name of the element that contains system properties we should set.
-   */
-  String PROPERTY_ELEMENT_NAME = "property";
-  /**
-   * The name of the attribute that contains a property key.
-   */
-  String PROPERTY_KEY_ATTRIBUTE_NAME = "key";
+  String LIBRARIES_DIRECTROY_NAME = "libraries";
 }

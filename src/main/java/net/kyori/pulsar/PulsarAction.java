@@ -30,7 +30,6 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.distribution.Distribution;
 import org.gradle.api.distribution.DistributionContainer;
-import org.gradle.api.distribution.plugins.DistributionPlugin;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.plugins.JavaPlugin;
 
@@ -45,10 +44,10 @@ public class PulsarAction implements Action<Project> {
 
   @Override
   public void execute(final Project project) {
-    final Distribution distribution = ((DistributionContainer) project.getExtensions().getByName("distributions")).getByName(DistributionPlugin.MAIN_DISTRIBUTION_NAME);
+    final Distribution distribution = ((DistributionContainer) project.getExtensions().getByName("distributions")).maybeCreate(Pulsar.DISTRIBUTION_NAME);
 
     final CopySpec libraries = project.copySpec();
-    libraries.into("libraries");
+    libraries.into(Pulsar.LIBRARIES_DIRECTROY_NAME);
 
     this.extension.filter.resolve(this.extension.configurations).forEach(dependency -> dependency.into(libraries));
 
