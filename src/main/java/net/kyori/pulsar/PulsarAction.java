@@ -58,7 +58,11 @@ public class PulsarAction implements Action<Project> {
 
     distribution.getContents().with(libraries);
 
-    final File bootstrap = new File(new File(project.getBuildDir(), "tmp"), BootstrapConstants.CONFIGURATION_FILE_NAME);
+    final File tmp = new File(project.getBuildDir(), "tmp");
+    if(!tmp.exists()) {
+      tmp.mkdirs();
+    }
+    final File bootstrap = new File(tmp, BootstrapConstants.CONFIGURATION_FILE_NAME);
     if(this.extension.bootstrap.write(project.getLogger(), bootstrap)) {
       distribution.getContents().from(bootstrap);
     }
