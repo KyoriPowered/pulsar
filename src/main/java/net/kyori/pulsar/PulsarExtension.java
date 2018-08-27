@@ -30,7 +30,6 @@ import net.kyori.pulsar.dependency.PulsarDependenciesImpl;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.plugins.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +42,6 @@ public class PulsarExtension {
 
   public PulsarExtension(final Project project) {
     this.filter = new PulsarDependenciesImpl(project);
-    this.configurations.add(project.getConfigurations().findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME));
   }
 
   public PulsarExtension bootstrap(final Action<PulsarBootstrap> action) {

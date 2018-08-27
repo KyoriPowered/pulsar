@@ -26,6 +26,7 @@ package net.kyori.pulsar;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.distribution.plugins.DistributionPlugin;
+import org.gradle.api.plugins.JavaPlugin;
 
 public class PulsarPlugin implements Plugin<Project> {
   @Override
@@ -33,6 +34,7 @@ public class PulsarPlugin implements Plugin<Project> {
     project.getPluginManager().apply(DistributionPlugin.class);
 
     final PulsarExtension extension = project.getExtensions().create("pulsar", PulsarExtension.class, project);
+    extension.getConfigurations().add(project.getConfigurations().findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME));
 
     project.afterEvaluate(new PulsarAction(extension));
   }
